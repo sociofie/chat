@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secure Chat</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="login">
+  <div class="login-shell">
+    <div class="brand-badge">Live Support</div>
+
+    <div class="card">
+      <p class="eyebrow">Secure access</p>
+      <h1>Login or create your chat account</h1>
+      <p class="card-copy">Use your email to open your private support thread. Your conversation stays grouped under your account.</p>
+
+      <input id="emailInput" placeholder="Enter email" />
+      <input id="passwordInput" type="password" placeholder="Enter password" />
+      <p id="authStatus" class="note">Use at least 6 characters for your password.</p>
+
+      <button onclick="signup()">Sign Up</button>
+      <button onclick="login()">Login</button>
+    </div>
+  </div>
+</div>
+
+<div id="chat" style="display:none;">
+  <div class="page-shell">
+    <div class="chat-container">
+      <div class="chat-header">
+        <div>
+          <p class="header-kicker">Customer chat</p>
+          <h2 id="chatTitle">Conversation</h2>
+        </div>
+        <div class="header-status" id="chatStatus">
+          <span class="status-dot"></span>
+          Waiting
+        </div>
+      </div>
+
+      <div id="messages"></div>
+
+      <div class="input-area">
+        <input id="messageInput" placeholder="Write your message..." disabled />
+        <button id="sendButton" onclick="sendMessage()" disabled>Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

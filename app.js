@@ -149,7 +149,7 @@ onAuthStateChanged(auth, (user) => {
 
   setComposerState(true);
   setAuthStatus("Signed in.");
-  setChatState(getDisplayName(user), "Connected");
+  setChatState(getDisplayName(user), "Reply in 1-2 Min");
   listenMessages();
 });
 

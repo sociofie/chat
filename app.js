@@ -87,7 +87,7 @@ function formatTime(timestamp) {
 }
 
 function getDisplayName() {
-  return nameInput.value.trim() || "Conversation";
+  return nameInput.value.trim() || currentUser?.email || "Conversation";
 }
 
 window.signup = async () => {
@@ -109,11 +109,9 @@ window.signup = async () => {
     setAuthStatus("Creating your account...");
     const userCred = await createUserWithEmailAndPassword(auth, email, password);
 
-    // 🔥 SAVE NAME TO DATABASE
     await push(ref(db, `users/${userCred.user.uid}`), {
       fullName
     });
-
   } catch (error) {
     setAuthStatus(error.message, true);
   }
@@ -156,7 +154,7 @@ onAuthStateChanged(auth, (user) => {
 
   setComposerState(true);
   setAuthStatus("Signed in.");
-  setChatState(getDisplayName(user), "Reply in 1-2 Min");
+  setChatState(getDisplayName(), "Reply in 1-2 Min");
   listenMessages();
 });
 
@@ -166,15 +164,16 @@ window.sendMessage = async () => {
   const text = messageInput.value.trim();
   if (!text) return;
 
+  const fullName = nameInput.value.trim() || currentUser.email || "Unknown";
   sendButton.disabled = true;
 
   try {
     await push(chatRef, {
-  user: currentUser.uid,
-  name: nameInput.value.trim(),
-  text,
-  time: serverTimestamp()
-});
+      user: currentUser.uid,
+      name: fullName,
+      text,
+      time: serverTimestamp()
+    });
 
     messageInput.value = "";
     messageInput.focus();
@@ -212,7 +211,7 @@ function listenMessages() {
 
 function renderMessage(msg) {
   const div = document.createElement("div");
-  const isOwnMessage = msg.user === currentUser?.email;
+  const isOwnMessage = msg.user === currentUser?.uid;
 
   div.classList.add("message", isOwnMessage ? "user" : "admin");
 

@@ -18,6 +18,7 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 let currentUser = "";
+let currentChatName = "";
 let currentRef = null;
 let messagesListener = null;
 let listeningRef = null;
@@ -81,32 +82,33 @@ onValue(usersRef, (snapshot) => {
   const users = [];
   userListEl.innerHTML = "";
 
-snapshot.forEach((chatSnapshot) => {
-  let lastTime = 0;
-  let lastText = "";
-  let fullName = "Unknown";
+  snapshot.forEach((chatSnapshot) => {
+    let lastTime = 0;
+    let lastText = "";
+    let fullName = "";
 
-  chatSnapshot.forEach((messageSnapshot) => {
-    const value = messageSnapshot.val() || {};
-    const nextTime = value.time || 0;
+    chatSnapshot.forEach((messageSnapshot) => {
+      const value = messageSnapshot.val() || {};
+      const nextTime = value.time || 0;
 
-    if (value.name) {
-      fullName = value.name; // ✅ grab name from message
-    }
+      if (!fullName && value.name) {
+        fullName = value.name;
+      }
 
-    if (nextTime >= lastTime) {
-      lastTime = nextTime;
-      lastText = value.text || "";
-    }
+      if (nextTime >= lastTime) {
+        lastTime = nextTime;
+        lastText = value.text || "";
+        fullName = value.name || fullName;
+      }
+    });
+
+    users.push({
+      id: chatSnapshot.key,
+      name: fullName || "Unknown",
+      lastText,
+      lastTime
+    });
   });
-
-  users.push({
-    id: chatSnapshot.key,
-    name: fullName,   // 👈 use real name
-    lastTime,
-    lastText
-  });
-});
 
   users.sort((a, b) => b.lastTime - a.lastTime);
 
@@ -116,6 +118,7 @@ snapshot.forEach((chatSnapshot) => {
 
   if (!users.length) {
     currentUser = "";
+    currentChatName = "";
     detachMessagesListener();
     currentRef = null;
     messagesEl.innerHTML = "";
@@ -125,11 +128,16 @@ snapshot.forEach((chatSnapshot) => {
     return;
   }
 
-  const currentStillExists = users.some((user) => user.name === currentUser);
+  const currentStillExists = users.some((user) => user.id === currentUser);
 
   if (!currentStillExists) {
-    openChat(users[0].name);
+    openChat(users[0].id, users[0].name);
   } else {
+    const activeUser = users.find((user) => user.id === currentUser);
+    if (activeUser) {
+      currentChatName = activeUser.name || "Unknown";
+      setReplyState(currentChatName, "Live thread");
+    }
     highlightActiveUser();
   }
 });
@@ -138,14 +146,14 @@ function createUserItem({ id, name, lastText }) {
   const div = document.createElement("div");
   div.classList.add("user-item");
   div.dataset.user = id;
-  div.onclick = () => openChat(id);
+  div.onclick = () => openChat(id, name);
 
   const textWrap = document.createElement("div");
   textWrap.className = "user-text";
 
   const nameEl = document.createElement("span");
   nameEl.className = "user-name";
-  nameEl.textContent = name;
+  nameEl.textContent = name || "Unknown";
 
   const previewEl = document.createElement("small");
   previewEl.className = "user-preview";
@@ -156,7 +164,7 @@ function createUserItem({ id, name, lastText }) {
   deleteButton.className = "delete-btn";
   deleteButton.onclick = (event) => {
     event.stopPropagation();
-    deleteUser(name);
+    deleteUser(id, name || "Unknown");
   };
 
   textWrap.appendChild(nameEl);
@@ -167,23 +175,31 @@ function createUserItem({ id, name, lastText }) {
   return div;
 }
 
-function openChat(userId) {
+function openChat(userId, displayName = "Unknown") {
   currentUser = userId;
+  currentChatName = displayName || "Unknown";
 
   detachMessagesListener();
   currentRef = ref(db, `chats/${userId}`);
 
   setComposerState(true);
-  setReplyState(userId, "Live thread"); // we'll improve this later
+  setReplyState(currentChatName, "Live thread");
   messagesEl.innerHTML = "";
 
   messagesListener = onValue(currentRef, (snapshot) => {
     messagesEl.innerHTML = "";
+    let headerName = currentChatName;
 
     snapshot.forEach((childSnapshot) => {
-      renderMessage(childSnapshot.val() || {});
+      const msg = childSnapshot.val() || {};
+      if (msg.name) {
+        headerName = msg.name;
+      }
+      renderMessage(msg);
     });
 
+    currentChatName = headerName || currentChatName || "Unknown";
+    setReplyState(currentChatName, "Live thread");
     messagesEl.scrollTop = messagesEl.scrollHeight;
   });
 
@@ -203,6 +219,7 @@ window.sendMessage = async () => {
   try {
     await push(ref(db, `chats/${currentUser}`), {
       user: "ADMIN",
+      name: "Admin",
       text,
       time: serverTimestamp()
     });
@@ -214,9 +231,9 @@ window.sendMessage = async () => {
   }
 };
 
-function deleteUser(name) {
+function deleteUser(userId, name) {
   if (!confirm(`Delete ${name}?`)) return;
-  remove(ref(db, `chats/${name}`));
+  remove(ref(db, `chats/${userId}`));
 }
 
 function highlightActiveUser() {
@@ -233,7 +250,7 @@ function renderMessage(msg) {
 
   const meta = document.createElement("div");
   meta.className = "message-meta";
-  meta.textContent = `${isAdmin ? "Admin" : "Customer"}${msg.time ? ` - ${formatTime(msg.time)}` : ""}`;
+  meta.textContent = `${isAdmin ? "Admin" : currentChatName || "Customer"}${msg.time ? ` - ${formatTime(msg.time)}` : ""}`;
 
   const body = document.createElement("div");
   body.className = "message-body";

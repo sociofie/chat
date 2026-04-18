@@ -254,7 +254,15 @@ function renderMessage(msg) {
 
   const body = document.createElement("div");
   body.className = "message-body";
-  body.textContent = msg.text || "";
+  const text = msg.text || "";
+
+const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+const formattedText = text.replace(urlRegex, (url) => {
+  return `<a href="${url}" target="_blank" style="color:#2563eb;text-decoration:underline;">${url}</a>`;
+});
+
+body.innerHTML = formattedText;
 
   div.appendChild(meta);
   div.appendChild(body);

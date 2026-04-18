@@ -81,26 +81,32 @@ onValue(usersRef, (snapshot) => {
   const users = [];
   userListEl.innerHTML = "";
 
-  snapshot.forEach((chatSnapshot) => {
-    let lastTime = 0;
-    let lastText = "";
+snapshot.forEach((chatSnapshot) => {
+  let lastTime = 0;
+  let lastText = "";
+  let fullName = "Unknown";
 
-    chatSnapshot.forEach((messageSnapshot) => {
-      const value = messageSnapshot.val() || {};
-      const nextTime = value.time || 0;
+  chatSnapshot.forEach((messageSnapshot) => {
+    const value = messageSnapshot.val() || {};
+    const nextTime = value.time || 0;
 
-      if (nextTime >= lastTime) {
-        lastTime = nextTime;
-        lastText = value.text || "";
-      }
-    });
+    if (value.name) {
+      fullName = value.name; // ✅ grab name from message
+    }
 
-    users.push({
-      name: chatSnapshot.key,
-      lastTime,
-      lastText
-    });
+    if (nextTime >= lastTime) {
+      lastTime = nextTime;
+      lastText = value.text || "";
+    }
   });
+
+  users.push({
+    id: chatSnapshot.key,
+    name: fullName,   // 👈 use real name
+    lastTime,
+    lastText
+  });
+});
 
   users.sort((a, b) => b.lastTime - a.lastTime);
 
@@ -128,11 +134,11 @@ onValue(usersRef, (snapshot) => {
   }
 });
 
-function createUserItem({ name, lastText }) {
+function createUserItem({ id, name, lastText }) {
   const div = document.createElement("div");
   div.classList.add("user-item");
-  div.dataset.user = name;
-  div.onclick = () => openChat(name);
+  div.dataset.user = id;
+  div.onclick = () => openChat(id);
 
   const textWrap = document.createElement("div");
   textWrap.className = "user-text";
@@ -161,10 +167,10 @@ function createUserItem({ name, lastText }) {
   return div;
 }
 
-function openChat(user) {
-  currentUser = user;
+function openChat(userId) {
+  currentUser = userId;
   detachMessagesListener();
-  currentRef = ref(db, `chats/${user}`);
+  currentRef = ref(db, `chats/${userId}`);
 
   setComposerState(true);
   setReplyState(user, "Live thread");

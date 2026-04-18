@@ -33,6 +33,7 @@ let chatRef = null;
 let messagesListener = null;
 let listeningRef = null;
 
+const nameInput = document.getElementById("nameInput");
 const emailInput = document.getElementById("emailInput");
 const passwordInput = document.getElementById("passwordInput");
 const authStatus = document.getElementById("authStatus");
@@ -85,17 +86,17 @@ function formatTime(timestamp) {
   });
 }
 
-function getDisplayName(user) {
-  if (!user?.email) return "Conversation";
-  return user.email;
+function getDisplayName() {
+  return nameInput.value.trim() || "Conversation";
 }
 
 window.signup = async () => {
+  const fullName = nameInput.value.trim();
   const email = emailInput.value.trim();
   const password = passwordInput.value.trim();
 
-  if (!email || !password) {
-    setAuthStatus("Enter both email and password to continue.", true);
+  if (!fullName || !email || !password) {
+    setAuthStatus("Enter name, email and password.", true);
     return;
   }
 
@@ -106,7 +107,13 @@ window.signup = async () => {
 
   try {
     setAuthStatus("Creating your account...");
-    await createUserWithEmailAndPassword(auth, email, password);
+    const userCred = await createUserWithEmailAndPassword(auth, email, password);
+
+    // 🔥 SAVE NAME TO DATABASE
+    await push(ref(db, `users/${userCred.user.uid}`), {
+      fullName
+    });
+
   } catch (error) {
     setAuthStatus(error.message, true);
   }
@@ -163,10 +170,11 @@ window.sendMessage = async () => {
 
   try {
     await push(chatRef, {
-      user: currentUser.email,
-      text,
-      time: serverTimestamp()
-    });
+  user: currentUser.uid,
+  name: nameInput.value.trim(),
+  text,
+  time: serverTimestamp()
+});
 
     messageInput.value = "";
     messageInput.focus();

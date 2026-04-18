@@ -8,7 +8,7 @@
 </head>
 <body>
 
-<button class="menu-btn" onclick="toggleUsers()">Menu</button>
+<button class="menu-btn" onclick="toggleUsers()">Conversations</button>
 
 <div class="page-shell admin-page">
   <div class="admin-container">
@@ -23,9 +23,12 @@
 
     <div class="chat">
       <div class="chat-header">
-        <div>
-          <p class="header-kicker">Admin console</p>
-          <h2 id="replyTitle">Reply panel</h2>
+        <div class="chat-header-main">
+          <div class="header-avatar admin-avatar">A</div>
+          <div>
+            <p class="header-kicker">Admin console</p>
+            <h2 id="replyTitle">Reply panel</h2>
+          </div>
         </div>
         <div class="header-status" id="replyStatus">
           <span class="status-dot"></span>
@@ -33,7 +36,14 @@
         </div>
       </div>
 
-      <div id="messages"></div>
+      <div id="messages" aria-live="polite"></div>
+
+      <div class="quick-replies" aria-label="Quick replies">
+        <button type="button" class="quick-reply-btn" data-reply="Hello 👋" onclick="(function(btn){const input=document.getElementById('messageInput');if(!input){return;}const text=btn.dataset.reply;input.value=input.value?input.value+(input.value.trim()?' ':'')+text:text;input.focus();input.dispatchEvent(new Event('input',{bubbles:true}));})(this)">Hello 👋</button>
+        <button type="button" class="quick-reply-btn" data-reply="We are checking your issue." onclick="(function(btn){const input=document.getElementById('messageInput');if(!input){return;}const text=btn.dataset.reply;input.value=input.value?input.value+(input.value.trim()?' ':'')+text:text;input.focus();input.dispatchEvent(new Event('input',{bubbles:true}));})(this)">We are checking your issue</button>
+        <button type="button" class="quick-reply-btn" data-reply="Please wait a moment." onclick="(function(btn){const input=document.getElementById('messageInput');if(!input){return;}const text=btn.dataset.reply;input.value=input.value?input.value+(input.value.trim()?' ':'')+text:text;input.focus();input.dispatchEvent(new Event('input',{bubbles:true}));})(this)">Please wait</button>
+        <button type="button" class="quick-reply-btn" data-reply="Thank you for your patience." onclick="(function(btn){const input=document.getElementById('messageInput');if(!input){return;}const text=btn.dataset.reply;input.value=input.value?input.value+(input.value.trim()?' ':'')+text:text;input.focus();input.dispatchEvent(new Event('input',{bubbles:true}));})(this)">Thank you</button>
+      </div>
 
       <div class="input-area">
         <input id="messageInput" placeholder="Select a chat to reply..." disabled />

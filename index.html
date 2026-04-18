@@ -22,27 +22,32 @@
       <input id="passwordInput" type="password" placeholder="Enter password" />
       <p id="authStatus" class="note">Use at least 6 characters for your password.</p>
 
-      <button onclick="signup()">Sign Up</button>
-      <button onclick="login()">Login</button>
+      <div class="auth-actions">
+        <button onclick="signup()">Sign Up</button>
+        <button class="secondary-btn" onclick="login()">Login</button>
+      </div>
     </div>
   </div>
 </div>
 
 <div id="chat" style="display:none;">
-  <div class="page-shell">
+  <div class="page-shell chat-page-shell">
     <div class="chat-container">
       <div class="chat-header">
-        <div>
-          <p class="header-kicker">Customer chat</p>
-          <h2 id="chatTitle">Conversation</h2>
+        <div class="chat-header-main">
+          <div class="header-avatar">S</div>
+          <div>
+            <p class="header-kicker">Support chat</p>
+            <h2 id="chatTitle">Support team</h2>
+          </div>
         </div>
         <div class="header-status" id="chatStatus">
           <span class="status-dot"></span>
-          Waiting
+          Connected
         </div>
       </div>
 
-      <div id="messages"></div>
+      <div id="messages" aria-live="polite"></div>
 
       <div class="input-area">
         <input id="messageInput" placeholder="Write your message..." disabled />

@@ -169,11 +169,12 @@ function createUserItem({ id, name, lastText }) {
 
 function openChat(userId) {
   currentUser = userId;
+
   detachMessagesListener();
   currentRef = ref(db, `chats/${userId}`);
 
   setComposerState(true);
-  setReplyState(user, "Live thread");
+  setReplyState(userId, "Live thread"); // we'll improve this later
   messagesEl.innerHTML = "";
 
   messagesListener = onValue(currentRef, (snapshot) => {

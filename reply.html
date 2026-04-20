@@ -44,15 +44,21 @@ We noticed your freelancing account doesn’t have enough reviews yet to secure 
 Would you like help landing your first job and earning your first review?" onclick="(function(btn){const input=document.getElementById('messageInput');if(!input){return;}const text=btn.dataset.reply;input.value=input.value?input.value+(input.value.trim()?' ':'')+text:text;input.focus();input.dispatchEvent(new Event('input',{bubbles:true}));})(this)">Hello 👋</button>
         
         <button type="button" class="quick-reply-btn" data-reply="Thank you for your trust. 
-Please go to the link below, complete the steps, and paste your details here afterward: 
+Please go to the link below, complete the steps, and paste your details here afterward:  
 https://sociofie.netlify.app/pages/receipt" onclick="(function(btn){const input=document.getElementById('messageInput');if(!input){return;}const text=btn.dataset.reply;input.value=input.value?input.value+(input.value.trim()?' ':'')+text:text;input.focus();input.dispatchEvent(new Event('input',{bubbles:true}));})(this)">Fill in form</button>
 
       <button 
 type="button" 
 class="quick-reply-btn" 
-data-reply="We’re currently reviewing your details and matching you with a suitable project.
-        Here’s how the process works:\n\n1. We find a project provider that fits your profile.\n2. You’ll connect with them through chat.\n3. Once the project provider is ready to assign you the project, a small service fee is required.\n4. After the fee is confirmed, the project is officially awarded to you.\n5. You can then complete the project at your own pace.\n6. Once completed, you’ll receive your first review 🎉\n\nIn the meantime, feel free to explore our website: \nhttps://sociofie.netlify.app/" 
-onclick="(function(btn){const input=document.getElementById('messageInput');if(!input){return;}const text=btn.dataset.reply;input.value=input.value?input.value+(input.value.trim()?'\n\n':'')+text:text;input.focus();input.dispatchEvent(new Event('input',{bubbles:true}));})(this)">
+data-reply="We’re currently reviewing your details and matching you with a suitable project. Thanks for your patience. Here’s how the process works:
+        1) We find a project provider that fits your profile. 
+        2) You’ll connect with them through chat. 
+        3) Once they’re ready to assign the project, a small service fee is required. 
+        4) After the fee is confirmed, the project is officially awarded to you. 
+        5) You can then complete the project at your own pace. 
+        6) Once completed, you’ll receive your first review. 
+        In the meantime, you can explore our website: https://sociofie.netlify.app/" 
+onclick="(function(btn){const input=document.getElementById('messageInput');if(!input){return;}const text=btn.dataset.reply;input.value=input.value?input.value+(input.value.trim()?' ':'')+text:text;input.focus();input.dispatchEvent(new Event('input',{bubbles:true}));})(this)">
 Steps+web
 </button>
         
